@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingCategory, setEditingCategory] = useState(null); // Track the category being edited
+  const [editingCategory, setEditingCategory] = useState(null);
 
   useEffect(() => {
     fetchCategories().then((response) => {
@@ -40,10 +40,60 @@ const CategoriesPage = () => {
   return (
     <div className="container mt-4">
       <h1 className="text-center mb-4">Categories</h1>
-      <CategoryForm onSubmit={handleAddCategory} />
+
+      {/* Data Entry Section */}
+      <div className="card mb-4 shadow-sm">
+        <div className="card-body">
+          <h5 className="card-title">Add New Category</h5>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              handleAddCategory({
+                name: formData.get('name'),
+                description: formData.get('description'),
+              });
+              e.target.reset(); // Clear the form
+            }}
+          >
+            <div className="mb-3">
+              <label htmlFor="categoryName" className="form-label">
+                Category Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="categoryName"
+                className="form-control"
+                placeholder="Enter category name"
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="description" className="form-label">
+                Description
+              </label>
+              <textarea
+                name="description"
+                id="description"
+                className="form-control"
+                placeholder="Enter description"
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              Submit
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* List Section */}
       <ul className="list-group">
         {categories.map((category) => (
-          <li key={category.id} className="list-group-item d-flex justify-content-between align-items-center">
+          <li
+            key={category.id}
+            className="list-group-item d-flex justify-content-between align-items-center"
+          >
             {editingCategory?.id === category.id ? (
               // Inline editing form
               <form
@@ -76,7 +126,9 @@ const CategoriesPage = () => {
                   />
                 </div>
                 <div className="d-flex justify-content-end">
-                  <button type="submit" className="btn btn-success btn-sm me-2">Save</button>
+                  <button type="submit" className="btn btn-success btn-sm me-2">
+                    Save
+                  </button>
                   <button
                     type="button"
                     className="btn btn-secondary btn-sm"
