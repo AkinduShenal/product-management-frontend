@@ -12,6 +12,8 @@ const ProductsPage = () => {
   useEffect(() => {
     Promise.all([fetchProducts(), fetchCategories()])
       .then(([productResponse, categoryResponse]) => {
+        console.log('Fetched Products:', productResponse.data); // Debugging fetched products
+        console.log('Fetched Categories:', categoryResponse.data); // Debugging fetched categories
         setProducts(productResponse.data);
         setCategories(categoryResponse.data);
         setLoading(false);
@@ -54,13 +56,12 @@ const ProductsPage = () => {
   return (
     <div>
       <h1>Products</h1>
-      {/* Pass categories to the ProductForm */}
       <ProductForm categories={categories} onSubmit={handleAddProduct} />
       <ul>
         {products.map((product) => (
           <li key={product.id}>
-            {product.name} - {product.description || 'No description available'} - 
-            ${product.price !== undefined && product.price !== null ? product.price.toFixed(2) : 'N/A'}
+            {product.name || 'Unnamed Product'} - {product.description || 'No description available'} - 
+            ${typeof product.price === 'number' || !isNaN(product.price) ? parseFloat(product.price).toFixed(2) : 'N/A'}
             <button onClick={() => handleUpdateProduct(product.id, { name: 'Updated Name' })}>
               Edit
             </button>
