@@ -6,6 +6,7 @@ import CategoryForm from '../components/CategoryForm';
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingCategory, setEditingCategory] = useState(null); // Track the category being edited
 
   useEffect(() => {
     fetchCategories().then((response) => {
@@ -20,9 +21,10 @@ const CategoriesPage = () => {
     });
   };
 
-  const handleUpdateCategory = (id, data) => {
-    updateCategory(id, data).then(() => {
-      setCategories(categories.map((cat) => (cat.id === id ? { ...cat, ...data } : cat)));
+  const handleUpdateCategory = (id, updatedData) => {
+    updateCategory(id, updatedData).then(() => {
+      setCategories(categories.map((cat) => (cat.id === id ? { ...cat, ...updatedData } : cat)));
+      setEditingCategory(null); // Exit editing mode
     });
   };
 
@@ -41,11 +43,43 @@ const CategoriesPage = () => {
       <ul>
         {categories.map((category) => (
           <li key={category.id}>
-            {category.name} - {category.description}
-            <button onClick={() => handleUpdateCategory(category.id, { name: 'Updated Name' })}>
-              Edit
-            </button>
-            <button onClick={() => handleDeleteCategory(category.id)}>Delete</button>
+            {editingCategory?.id === category.id ? (
+              // Inline editing form
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleUpdateCategory(category.id, editingCategory);
+                }}
+              >
+                <input
+                  type="text"
+                  value={editingCategory.name}
+                  onChange={(e) =>
+                    setEditingCategory({ ...editingCategory, name: e.target.value })
+                  }
+                  placeholder="Category Name"
+                  required
+                />
+                <textarea
+                  value={editingCategory.description}
+                  onChange={(e) =>
+                    setEditingCategory({ ...editingCategory, description: e.target.value })
+                  }
+                  placeholder="Description"
+                />
+                <button type="submit">Save</button>
+                <button type="button" onClick={() => setEditingCategory(null)}>
+                  Cancel
+                </button>
+              </form>
+            ) : (
+              // Normal display mode
+              <>
+                {category.name} - {category.description}
+                <button onClick={() => setEditingCategory(category)}>Edit</button>
+                <button onClick={() => handleDeleteCategory(category.id)}>Delete</button>
+              </>
+            )}
           </li>
         ))}
       </ul>
