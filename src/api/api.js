@@ -1,32 +1,17 @@
 import axios from 'axios';
 
-// Set the base URL for the API
 const API = axios.create({
-  baseURL: 'http://localhost:8000/api', // Replace with your backend URL
+  baseURL: 'http://localhost:8000/api', // Adjust the base URL if necessary
 });
 
-// Example: Get all products
-export const fetchProducts = () => API.get('/products');
-
-// Example: Get all categories
 export const fetchCategories = () => API.get('/categories');
-
-// Example: Add a new product
-export const createProduct = (productData) => API.post('/products', productData);
-
-// Example: Add a new category
-export const createCategory = (categoryData) => API.post('/categories', categoryData);
-
-// Example: Delete a product
-export const deleteProduct = (id) => API.delete(`/products/${id}`);
-
-// Example: Delete a category
+export const createCategory = (data) => API.post('/categories', data);
+export const updateCategory = (id, data) => API.put(`/categories/${id}`, data);
 export const deleteCategory = (id) => API.delete(`/categories/${id}`);
 
-// Example: Update a product
-export const updateProduct = (id, updatedData) => API.put(`/products/${id}`, updatedData);
-
-// Example: Update a category
-export const updateCategory = (id, updatedData) => API.put(`/categories/${id}`, updatedData);
+export const fetchProducts = () => API.get('/products');
+export const createProduct = (data) => API.post('/products', data);
+export const updateProduct = (id, data) => API.put(`/products/${id}`, data);
+export const deleteProduct = (id) => API.delete(`/products/${id}`);
 
 export default API;
