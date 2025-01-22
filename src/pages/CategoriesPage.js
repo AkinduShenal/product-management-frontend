@@ -1,44 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { fetchCategories, deleteCategory } from '../api/api';
+import React, { useEffect, useState } from 'react';
+import { fetchCategories, createCategory, updateCategory, deleteCategory } from '../api/api';
+import Loader from '../components/Loader';
 import CategoryForm from '../components/CategoryForm';
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch categories when the component loads
   useEffect(() => {
-    loadCategories();
+    fetchCategories().then((response) => {
+      setCategories(response.data);
+      setLoading(false);
+    });
   }, []);
 
-  // Load categories from the API
-  const loadCategories = () => {
-    fetchCategories()
-      .then((response) => setCategories(response.data))
-      .catch((error) => console.error('Error fetching categories:', error));
+  const handleAddCategory = (data) => {
+    createCategory(data).then((response) => {
+      setCategories([...categories, response.data]);
+    });
   };
 
-  // Handle category deletion
-  const handleDelete = (id) => {
-    deleteCategory(id)
-      .then(() => loadCategories())
-      .catch((error) => console.error('Error deleting category:', error));
+  const handleUpdateCategory = (id, data) => {
+    updateCategory(id, data).then(() => {
+      setCategories(categories.map((cat) => (cat.id === id ? { ...cat, ...data } : cat)));
+    });
   };
+
+  const handleDeleteCategory = (id) => {
+    deleteCategory(id).then(() => {
+      setCategories(categories.filter((cat) => cat.id !== id));
+    });
+  };
+
+  if (loading) return <Loader />;
 
   return (
     <div>
       <h1>Categories</h1>
-      <CategoryForm
-        onSuccess={loadCategories}
-        editingCategory={editingCategory}
-        onCancelEdit={() => setEditingCategory(null)}
-      />
+      <CategoryForm onSubmit={handleAddCategory} />
       <ul>
         {categories.map((category) => (
           <li key={category.id}>
-            {category.name}
-            <button onClick={() => setEditingCategory(category)}>Edit</button>
-            <button onClick={() => handleDelete(category.id)}>Delete</button>
+            {category.name} - {category.description}
+            <button onClick={() => handleUpdateCategory(category.id, { name: 'Updated Name' })}>
+              Edit
+            </button>
+            <button onClick={() => handleDeleteCategory(category.id)}>Delete</button>
           </li>
         ))}
       </ul>
