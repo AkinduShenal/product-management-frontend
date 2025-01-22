@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchCategories, deleteCategory } from '../services/api';
+import { fetchCategories, deleteCategory } from '../api/api';
 import CategoryForm from '../components/CategoryForm';
 
 const CategoriesPage = () => {

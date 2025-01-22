@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createProduct, updateProduct } from '../services/api';
+import { createProduct, updateProduct } from '../api/api';
 
 const ProductForm = ({ onSuccess, editingProduct, onCancelEdit }) => {
   const [formData, setFormData] = useState({ name: '', price: '' });
