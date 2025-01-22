@@ -1,48 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { fetchProducts, createProduct, updateProduct, deleteProduct } from '../api/api';
+import { fetchProducts, createProduct, updateProduct, deleteProduct, fetchCategories } from '../api/api';
 import Loader from '../components/Loader';
 import ProductForm from '../components/ProductForm';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch products and categories on component mount
   useEffect(() => {
-    fetchProducts().then((response) => {
-      setProducts(response.data);
-      setLoading(false);
-    });
+    Promise.all([fetchProducts(), fetchCategories()])
+      .then(([productResponse, categoryResponse]) => {
+        setProducts(productResponse.data);
+        setCategories(categoryResponse.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      });
   }, []);
 
+  // Add a new product
   const handleAddProduct = (data) => {
-    createProduct(data).then((response) => {
-      setProducts([...products, response.data]);
-    });
+    createProduct(data)
+      .then((response) => {
+        setProducts([...products, response.data]);
+      })
+      .catch((error) => console.error('Error adding product:', error));
   };
 
+  // Update an existing product
   const handleUpdateProduct = (id, data) => {
-    updateProduct(id, data).then(() => {
-      setProducts(products.map((prod) => (prod.id === id ? { ...prod, ...data } : prod)));
-    });
+    updateProduct(id, data)
+      .then(() => {
+        setProducts(products.map((prod) => (prod.id === id ? { ...prod, ...data } : prod)));
+      })
+      .catch((error) => console.error('Error updating product:', error));
   };
 
+  // Delete a product
   const handleDeleteProduct = (id) => {
-    deleteProduct(id).then(() => {
-      setProducts(products.filter((prod) => prod.id !== id));
-    });
+    deleteProduct(id)
+      .then(() => {
+        setProducts(products.filter((prod) => prod.id !== id));
+      })
+      .catch((error) => console.error('Error deleting product:', error));
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader />; // Show loader while fetching data
 
   return (
     <div>
       <h1>Products</h1>
+      {/* Pass categories to the ProductForm */}
       <ProductForm categories={categories} onSubmit={handleAddProduct} />
       <ul>
         {products.map((product) => (
           <li key={product.id}>
-            {product.name} - {product.description} - {product.price}
+            {product.name} - {product.description || 'No description available'} - 
+            ${product.price !== undefined && product.price !== null ? product.price.toFixed(2) : 'N/A'}
             <button onClick={() => handleUpdateProduct(product.id, { name: 'Updated Name' })}>
               Edit
             </button>

@@ -43,7 +43,7 @@ const ProductForm = ({ categories, onSubmit, initialData = {} }) => {
       <select
         value={categoryId}
         onChange={(e) => setCategoryId(e.target.value)}
-        required
+        
       >
         <option value="" disabled>Select Category</option>
         {categories.map((category) => (
