@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchCategories, createCategory, updateCategory, deleteCategory } from '../api/api';
 import Loader from '../components/Loader';
 import CategoryForm from '../components/CategoryForm';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -37,12 +38,12 @@ const CategoriesPage = () => {
   if (loading) return <Loader />;
 
   return (
-    <div>
-      <h1>Categories</h1>
+    <div className="container mt-4">
+      <h1 className="text-center mb-4">Categories</h1>
       <CategoryForm onSubmit={handleAddCategory} />
-      <ul>
+      <ul className="list-group">
         {categories.map((category) => (
-          <li key={category.id}>
+          <li key={category.id} className="list-group-item d-flex justify-content-between align-items-center">
             {editingCategory?.id === category.id ? (
               // Inline editing form
               <form
@@ -50,34 +51,61 @@ const CategoriesPage = () => {
                   e.preventDefault();
                   handleUpdateCategory(category.id, editingCategory);
                 }}
+                className="w-100"
               >
-                <input
-                  type="text"
-                  value={editingCategory.name}
-                  onChange={(e) =>
-                    setEditingCategory({ ...editingCategory, name: e.target.value })
-                  }
-                  placeholder="Category Name"
-                  required
-                />
-                <textarea
-                  value={editingCategory.description}
-                  onChange={(e) =>
-                    setEditingCategory({ ...editingCategory, description: e.target.value })
-                  }
-                  placeholder="Description"
-                />
-                <button type="submit">Save</button>
-                <button type="button" onClick={() => setEditingCategory(null)}>
-                  Cancel
-                </button>
+                <div className="mb-2">
+                  <input
+                    type="text"
+                    value={editingCategory.name}
+                    onChange={(e) =>
+                      setEditingCategory({ ...editingCategory, name: e.target.value })
+                    }
+                    placeholder="Category Name"
+                    required
+                    className="form-control"
+                  />
+                </div>
+                <div className="mb-2">
+                  <textarea
+                    value={editingCategory.description}
+                    onChange={(e) =>
+                      setEditingCategory({ ...editingCategory, description: e.target.value })
+                    }
+                    placeholder="Description"
+                    className="form-control"
+                  />
+                </div>
+                <div className="d-flex justify-content-end">
+                  <button type="submit" className="btn btn-success btn-sm me-2">Save</button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setEditingCategory(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </form>
             ) : (
               // Normal display mode
               <>
-                {category.name} - {category.description}
-                <button onClick={() => setEditingCategory(category)}>Edit</button>
-                <button onClick={() => handleDeleteCategory(category.id)}>Delete</button>
+                <div>
+                  <strong>{category.name}</strong> - {category.description}
+                </div>
+                <div>
+                  <button
+                    onClick={() => setEditingCategory(category)}
+                    className="btn btn-primary btn-sm me-2"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteCategory(category.id)}
+                    className="btn btn-danger btn-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
               </>
             )}
           </li>
