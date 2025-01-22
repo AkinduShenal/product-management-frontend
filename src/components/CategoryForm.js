@@ -1,26 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { createCategory, updateCategory } from '../api/api';
+import React, { useState } from 'react';
 
-const CategoryForm = ({ onSuccess, editingCategory, onCancelEdit }) => {
-  const [formData, setFormData] = useState({ name: '' });
-
-  useEffect(() => {
-    if (editingCategory) setFormData(editingCategory);
-  }, [editingCategory]);
+const CategoryForm = ({ onSubmit, initialData = {} }) => {
+  const [name, setName] = useState(initialData.name || '');
+  const [description, setDescription] = useState(initialData.description || '');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const action = editingCategory
-      ? updateCategory(editingCategory.id, formData)
-      : createCategory(formData);
-
-    action
-      .then(() => {
-        onSuccess();
-        setFormData({ name: '' });
-        if (onCancelEdit) onCancelEdit();
-      })
-      .catch((error) => console.error('Error saving category:', error));
+    onSubmit({ name, description });
   };
 
   return (
@@ -28,12 +14,16 @@ const CategoryForm = ({ onSuccess, editingCategory, onCancelEdit }) => {
       <input
         type="text"
         placeholder="Category Name"
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         required
       />
-      <button type="submit">{editingCategory ? 'Update' : 'Add'} Category</button>
-      {editingCategory && <button onClick={onCancelEdit}>Cancel</button>}
+      <textarea
+        placeholder="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <button type="submit">Submit</button>
     </form>
   );
 };

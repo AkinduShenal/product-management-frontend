@@ -1,26 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { createProduct, updateProduct } from '../api/api';
+import React, { useState } from 'react';
 
-const ProductForm = ({ onSuccess, editingProduct, onCancelEdit }) => {
-  const [formData, setFormData] = useState({ name: '', price: '' });
-
-  useEffect(() => {
-    if (editingProduct) setFormData(editingProduct);
-  }, [editingProduct]);
+const ProductForm = ({ categories, onSubmit, initialData = {} }) => {
+  const [name, setName] = useState(initialData.name || '');
+  const [description, setDescription] = useState(initialData.description || '');
+  const [price, setPrice] = useState(initialData.price || '');
+  const [quantity, setQuantity] = useState(initialData.quantity || '');
+  const [categoryId, setCategoryId] = useState(initialData.category_id || '');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const action = editingProduct
-      ? updateProduct(editingProduct.id, formData)
-      : createProduct(formData);
-
-    action
-      .then(() => {
-        onSuccess();
-        setFormData({ name: '', price: '' });
-        if (onCancelEdit) onCancelEdit();
-      })
-      .catch((error) => console.error('Error saving product:', error));
+    onSubmit({ name, description, price, quantity, category_id: categoryId });
   };
 
   return (
@@ -28,19 +17,40 @@ const ProductForm = ({ onSuccess, editingProduct, onCancelEdit }) => {
       <input
         type="text"
         placeholder="Product Name"
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         required
+      />
+      <textarea
+        placeholder="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
       />
       <input
         type="number"
         placeholder="Price"
-        value={formData.price}
-        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
         required
       />
-      <button type="submit">{editingProduct ? 'Update' : 'Add'} Product</button>
-      {editingProduct && <button onClick={onCancelEdit}>Cancel</button>}
+      <input
+        type="number"
+        placeholder="Quantity"
+        value={quantity}
+        onChange={(e) => setQuantity(e.target.value)}
+        required
+      />
+      <select
+        value={categoryId}
+        onChange={(e) => setCategoryId(e.target.value)}
+        required
+      >
+        <option value="" disabled>Select Category</option>
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>{category.name}</option>
+        ))}
+      </select>
+      <button type="submit">Submit</button>
     </form>
   );
 };
